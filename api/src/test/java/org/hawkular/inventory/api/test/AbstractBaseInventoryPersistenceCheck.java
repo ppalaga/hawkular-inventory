@@ -179,7 +179,9 @@ public abstract class AbstractBaseInventoryPersistenceCheck<E> {
         assert inventory.tenants().get("com.example.tenant").resourceTypes()
                 .create(new ResourceType.Blueprint("Kachna", "1.0")).entity().getId().equals("Kachna");
         assert inventory.tenants().get("com.example.tenant").resourceTypes()
-                .create(new ResourceType.Blueprint("Playroom", "1.0")).entity().getId().equals("Playroom");
+                .create(new ResourceType.Blueprint("Playroom", "1.0", new HashMap<String, Object>() {{
+                    put("ownedByDepartment", "Facilities");
+                }})).entity().getId().equals("Playroom");
         assert inventory.tenants().get("com.example.tenant").metricTypes()
                 .create(new MetricType.Blueprint("Size", MetricUnit.BYTE)).entity().getId().equals("Size");
         inventory.tenants().get("com.example.tenant").resourceTypes().get("Playroom").metricTypes().associate("Size");
@@ -713,6 +715,17 @@ public abstract class AbstractBaseInventoryPersistenceCheck<E> {
 
         Assert.assertEquals(6, inventory.getBackend().query(Query.path().with(type(Resource.class)).get(),
                 Pager.unlimited(Order.unspecified())).size());
+    }
+
+    @Test
+    public void testResourcesFilteredByTypeProperty() throws Exception {
+        Resource r = inventory.tenants().get("com.example.tenant").environments().get("test").feedlessResources()
+                .getAll(new Filter[][]{
+                        {Defined.by(new ResourceType("com.example.tenant", "Playroom", "1.0")),
+                            With.propertyValue("ownedByDepartment", "Facilities")},
+                        })
+                .entities().iterator().next();
+        Assert.assertEquals("playroom1", r.getId());
     }
 
     @Test
