@@ -232,14 +232,10 @@ public final class TraversalContext<BE, E extends AbstractElement<?, ?>> {
          * @see #where(Filter...)
          */
         public Builder<BE, E> whereAll(Filter[][] filters) {
-            if (filters.length == 1) {
-                return where(filters[0]);
-            } else {
-                for (Filter[] fs : filters) {
-                    hop().where(fs);
-                }
-                return this;
+            for (Filter[] fs : filters) {
+                where(fs);
             }
+            return this;
         }
 
         /**
@@ -249,7 +245,7 @@ public final class TraversalContext<BE, E extends AbstractElement<?, ?>> {
          * @return this builder
          */
         public Builder<BE, E> where(Filter[][] filters) {
-            selectExtender.filter().with(filters);
+            selectExtender.with(filters);
             return this;
         }
 
@@ -260,7 +256,7 @@ public final class TraversalContext<BE, E extends AbstractElement<?, ?>> {
          * @return this builder
          */
         public Builder<BE, E> where(Filter... filters) {
-            selectExtender.filter().with(filters);
+            selectExtender.with(filters);
             return this;
         }
 
